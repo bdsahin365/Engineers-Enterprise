@@ -1,10 +1,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageCircle, Phone, ArrowRight, ShieldCheck, Star,
   Construction, CheckCircle2, Ruler, Layout, Sparkles,
-  Award, HeartHandshake, Zap, ChevronRight, Truck, Shield, Clock, ArrowUpRight, Package
+  Award, HeartHandshake, Zap, ChevronRight, Truck, Shield, Clock, ArrowUpRight, Package,
+  ExternalLink, Users, Building2
 } from 'lucide-react';
 import { Category, HomepageData, CategoryItem } from '../types';
 import { WHATSAPP_NUMBER, IMO_NUMBER } from '../constants';
@@ -13,6 +15,7 @@ import * as LucideIcons from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
 import DynamicIcon from '../components/DynamicIcon';
 import { usePreview } from '../contexts/PreviewContext';
+import { cn } from '../utils/cn';
 
 const Home: React.FC = () => {
   const { isPreview, previewData } = usePreview();
@@ -76,7 +79,7 @@ const Home: React.FC = () => {
   }
 
   const featuredProduct = homepageData?.featuredProduct;
-  const heroTitle = homepageData?.heroTitle || "ডেকোরেটিভ কংক্রিট পিলার ও বিল্ডিং ডিজাইন";
+  const heroTitle = homepageData?.heroTitle || "ডেকোরেティブ কংক্রিট পিলার ও বিল্ডিং ডিজাইন";
   const heroSubtitle = homepageData?.heroSubtitle || "মজবুত, টেকসই ও প্রিমিয়াম কংক্রিট কাজ।";
 
   // Use CMS categories if available, otherwise fall back to enum
@@ -127,14 +130,18 @@ const Home: React.FC = () => {
   const stats = homepageData?.stats?.map(s => ({
     ...s,
     icon: getIcon(s.icon, Star)
-  })) || [];
+  })) || [
+      { title: "সফল প্রজেক্ট", value: "৫০০+", icon: Building2 },
+      { title: "হ্যাপি কাস্টমার", value: "১০০০+", icon: Users },
+      { title: "অভিজ্ঞতা", value: "১০ বছর", icon: Award }
+    ];
 
   const heroBadge = homepageData?.heroBadge || "বাংলাদেশি পরিবেশ উপযোগী ডিজাইন";
   const featuredProductTitle = homepageData?.featuredProductTitle || "জনপ্রিয় পণ্য";
-  const featuredProductSubtitle = homepageData?.featuredProductDescription || "ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।";
+  const featuredProductSubtitle = homepageData?.featuredProductDescription || "ডেকোরেティブ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।";
 
   const categoriesTitle = homepageData?.categoriesTitle || "আমাদের পণ্যসমূহ";
-  const categoriesSubtitle = homepageData?.categoriesSubtitle || "বাড়ি, বারান্দা ও বিল্ডিংয়ের সৌন্দর্য বাড়াতে আমাদের রয়েছে বিভিন্ন ডেকোরেটিভ কংক্রিট পণ্য। সেরা ডিজাইনের গ্যারান্টি।";
+  const categoriesSubtitle = homepageData?.categoriesSubtitle || "বাড়ি, বারান্দা ও বিল্ডিংয়ের সৌন্দর্য বাড়াতে আমাদের রয়েছে বিভিন্ন ডেকোরেティブ কংক্রিট পণ্য। সেরা ডিজাইনের গ্যারান্টি।";
 
   const featuresTitle = homepageData?.featuresTitle || "কেন Engineers Enterprise বেছে নেবেন?";
   const featuresSubtitle = homepageData?.featuresSubtitle || "আমরা সুন্দর ডিজাইনের পাশাপাশি গুণগত মানকে সবচেয়ে বেশি গুরুত্ব দিই।";
@@ -153,59 +160,116 @@ const Home: React.FC = () => {
 
 
   return (
-    <div className="pb-20 md:pb-0">
-      {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-slate-900 text-white overflow-hidden pt-10">
-        <div className="absolute inset-0 opacity-40">
-          <img
-            src={homepageData?.heroImage || "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=1920"}
-            alt="Construction background"
-            className="w-full h-full object-cover"
-          />
+    <div className="pb-20 md:pb-0 overflow-x-hidden">
+      {/* Minimal Full-Screen Hero Section */}
+      <section className="relative bg-slate-950 text-white min-h-[calc(100vh-80px)] flex flex-col items-center justify-center py-10 overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-indigo-900/10 blur-[120px] rounded-full"></div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent"></div>
 
-        <div className="max-w-7xl mx-auto px-4 relative z-10 py-16">
-          <div className="max-w-2xl space-y-8 animate-in slide-in-from-left duration-1000">
-            <div className="inline-flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-full backdrop-blur-md">
-              <Sparkles size={16} className="text-blue-400" />
-              <span className="text-xs font-black uppercase tracking-widest text-blue-300">{heroBadge}</span>
-            </div>
+        <div className="container mx-auto px-4 relative z-10 text-center flex-grow flex flex-col items-center justify-center">
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 bg-blue-500/5 border border-blue-500/10 px-4 py-2 rounded-full backdrop-blur-sm"
+            >
+              <Sparkles size={14} className="text-blue-400" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-blue-300/80">
+                {heroBadge}
+              </span>
+            </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight"
+            >
               {heroTitle.split(' ').map((word, i) =>
-                word.includes('পিলার') || word.includes('কংক্রিট') ? <span key={i} className="text-blue-500 block md:inline">{word} </span> : word + " "
+                word.includes('পিলার') || word.includes('কংক্রিট') ? (
+                  <span key={i} className="text-blue-500">
+                    {word}{" "}
+                  </span>
+                ) : (
+                  <span key={i} className="inline-block">{word} </span>
+                )
               )}
-            </h1>
+            </motion.h1>
 
-            <p className="text-lg md:text-2xl text-slate-300 leading-relaxed font-medium">
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-400 leading-relaxed font-medium max-w-2xl mx-auto"
+            >
               {heroSubtitle}
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-5"
+            >
               <a
                 href={`https://wa.me/${whatsapp}`}
-                className="group flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white px-8 py-5 rounded-2xl text-lg font-black transition-all shadow-2xl shadow-green-600/20 active:scale-95"
+                className="group relative flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-[24px] text-lg font-black transition-all shadow-xl shadow-blue-600/20 active:scale-95 overflow-hidden"
               >
-                <MessageCircle size={24} className="group-hover:rotate-12 transition-transform" />
-                <span>WhatsApp এ অর্ডার করুন</span>
+                <MessageCircle size={22} className="group-hover:rotate-12 transition-transform duration-300" />
+                <span>WhatsApp এ অর্ডার দিন</span>
               </a>
               <a
                 href={`tel:${imo}`}
-                className="flex items-center justify-center space-x-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-5 rounded-2xl text-lg font-black backdrop-blur-md transition-all active:scale-95"
+                className="flex items-center justify-center space-x-3 bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 px-8 py-5 rounded-[24px] text-lg font-black transition-all active:scale-95"
               >
-                <MessageCircle size={24} className="text-blue-400" />
-                <span>IMO এ যোগাযোগ</span>
+                <Phone size={22} className="text-blue-500" />
+                <span>IMO তে যোগাযোগ</span>
               </a>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-6 pt-6 border-t border-white/10 opacity-70">
-              <div className="text-xs font-bold uppercase tracking-tighter flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-blue-500" /> নিজস্ব কারখানায় তৈরি
+            {/* Compact Proof Strip */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="flex items-center justify-center gap-8 pt-8"
+            >
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-950 bg-slate-800 overflow-hidden ring-1 ring-blue-500/20">
+                    <img src={`https://i.pravatar.cc/100?u=${i}`} alt="User" className="w-full h-full object-cover" />
+                  </div>
+                ))}
               </div>
-              <div className="text-xs font-bold uppercase tracking-tighter flex items-center gap-2">
-                <CheckCircle2 size={14} className="text-blue-500" /> দীর্ঘস্থায়ী স্থায়িত্ব
+              <div className="h-4 w-px bg-slate-800"></div>
+              <div className="text-left">
+                <div className="flex text-blue-500 gap-0.5">
+                  {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={10} fill="currentColor" />)}
+                </div>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">১০০০+ হ্যাপি কাস্টমার</div>
               </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Simplified Stats Section */}
+        <div className="w-full border-t border-white/5 bg-white/[0.02] backdrop-blur-sm mt-auto">
+          <div className="container mx-auto px-4 py-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+              {stats.map((stat, i) => (
+                <div key={i} className="flex flex-col items-center justify-center text-center space-y-1">
+                  <div className="text-2xl md:text-3xl font-black text-white">{stat.value}</div>
+                  <div className="text-[10px] md:text-xs font-bold text-blue-500/60 uppercase tracking-widest">{stat.title}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

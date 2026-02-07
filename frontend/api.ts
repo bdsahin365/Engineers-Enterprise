@@ -5,8 +5,8 @@ const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
 const STRAPI_TOKEN = import.meta.env.VITE_STRAPI_TOKEN || '';
 const API_BASE = `${STRAPI_URL}/api`;
 
-const getHeaders = () => {
-  const headers: HeadersInit = {
+const getHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
   if (STRAPI_TOKEN) {
@@ -23,50 +23,45 @@ const getHeaders = () => {
 const flattenData = (data: any): any => {
   if (!data) return null;
 
+  // Handle Strapi's data-wrapped objects or arrays first
+  if (data.data !== undefined) {
+    return flattenData(data.data);
+  }
+
+  // Handle arrays
   if (Array.isArray(data)) {
     return data.map(item => flattenData(item));
   }
 
-  const id = data.id;
+  // Handle the single item if it's an object with attributes (Strapi v4 pattern)
   const attributes = data.attributes || data;
+  const id = data.documentId || data.id || attributes.id;
 
-  const flattened: any = { id: id ? id.toString() : undefined };
+  // If it's not an object (e.g., a primitive), return as is
+  if (typeof attributes !== 'object' || attributes === null) {
+    return attributes;
+  }
+
+  // Check if this is a Strapi media object (has a url)
+  if (attributes.url && typeof attributes.url === 'string') {
+    const url = attributes.url;
+    return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+  }
+
+  const flattened: any = id ? { id: id.toString() } : {};
 
   for (const key in attributes) {
+    if (key === 'id') continue;
     const value = attributes[key];
 
-    // Handle nested data structures (like images or relations)
-    if (value && typeof value === 'object' && 'data' in value) {
-      if (Array.isArray(value.data)) {
-        flattened[key] = value.data.map((item: any) => {
-          // Special case for Strapi images
-          if (item.attributes?.url) {
-            const url = item.attributes.url;
-            return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
-          }
-          return flattenData(item);
-        });
-      } else if (value.data !== null) {
-        // Single media field (like logo, heroImage)
-        if (value.data.attributes?.url) {
-          const url = value.data.attributes.url;
-          flattened[key] = url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
-        } else {
-          flattened[key] = flattenData(value.data);
-        }
-      } else {
-        flattened[key] = null;
-      }
-    }
-    // Handle already-flattened media (Strapi sometimes returns flat objects with url property)
-    else if (value && typeof value === 'object' && value.url && typeof value.url === 'string') {
-      // This is an already-flattened image object
-      const url = value.url;
-      flattened[key] = url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
-    }
-    else {
-      flattened[key] = value;
-    }
+    // Recursive flattening for all other values
+    // This will handle nested relations, components, and media arrays/objects
+    const flattenedValue = flattenData(value);
+
+    // If the flattened result is an object with an ID but nothing else from the original value,
+    // and the original was complex, we might want to be careful.
+    // But for Strapi, usually flattenData(value) does the right thing.
+    flattened[key] = flattenedValue;
   }
 
   return flattened;
@@ -136,9 +131,24 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch products');
     const json = await response.json();
-    const flattened = flattenData(json.data);
-    console.log('Products from API:', flattened); // DEBUG
-    return flattened;
+    return flattenData(json.data);
+  },
+
+  getProduct: async (id: string): Promise<Product> => {
+    const response = await fetch(`${API_BASE}/products/${id}?populate=deep`, {
+      headers: getHeaders(),
+    });
+    // Fallback if populate=deep is not installed
+    if (!response.ok) {
+      const resp2 = await fetch(`${API_BASE}/products/${id}?populate=*`, {
+        headers: getHeaders(),
+      });
+      if (!resp2.ok) throw new Error('Failed to fetch product');
+      const json = await resp2.json();
+      return flattenData(json.data);
+    }
+    const json = await response.json();
+    return flattenData(json.data);
   },
 
   createProduct: async (product: Partial<Product>): Promise<Product> => {
@@ -171,7 +181,6 @@ export const api = {
 
   deleteProduct: async (id: string): Promise<void> => {
     const headers = getHeaders();
-    // @ts-ignore
     delete headers['Content-Type']; // DELETE usually doesn't have body/content-type
 
     const response = await fetch(`${API_BASE}/products/${id}`, {

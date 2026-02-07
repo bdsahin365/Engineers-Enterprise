@@ -123,6 +123,7 @@ export interface CategoryItem {
 }
 
 export interface HomepageData {
+  id?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   heroBadge?: string;
@@ -148,21 +149,25 @@ export interface HomepageData {
   statsTitle?: string;
   statsSubtitle?: string;
   features?: {
+    id?: string;
     title: string;
     description: string;
     icon: string;
   }[];
   stats?: {
+    id?: string;
     label: string;
     value: string;
     icon: string;
   }[];
   whyChooseUs?: {
+    id?: string;
     title: string;
     description: string;
     icon: string;
   }[];
   orderSteps?: {
+    id?: string;
     title: string;
     description: string;
     icon: string;
@@ -170,6 +175,7 @@ export interface HomepageData {
 }
 
 export interface GlobalData {
+  id?: string;
   siteName: string;
   logo?: string;
   contactPhone?: string;
@@ -177,4 +183,14 @@ export interface GlobalData {
   address?: string;
   facebookLink?: string;
   youtubeLink?: string;
+  whyChooseUsTitle?: string;
+  whyChooseUsSubtitle?: string;
+  howToOrderTitle?: string;
+  howToOrderSubtitle?: string;
+  howToOrderSteps?: {
+    title: string;
+    description: string;
+    icon: string;
+  }[];
 }
+

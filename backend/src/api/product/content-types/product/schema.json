@@ -55,7 +55,9 @@
             "type": "decimal"
         },
         "pillarConfig": {
-            "type": "json"
+            "type": "component",
+            "repeatable": false,
+            "component": "product.pillar-config"
         }
     }
 }

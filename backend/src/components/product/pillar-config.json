@@ -1,0 +1,26 @@
+{
+    "collectionName": "components_product_pillar_configs",
+    "info": {
+        "displayName": "Pillar Config",
+        "icon": "settings",
+        "description": ""
+    },
+    "options": {},
+    "attributes": {
+        "tops": {
+            "type": "component",
+            "repeatable": true,
+            "component": "product.pillar-part"
+        },
+        "bottoms": {
+            "type": "component",
+            "repeatable": true,
+            "component": "product.pillar-part"
+        },
+        "middlePricePerFoot": {
+            "type": "decimal",
+            "required": true,
+            "default": 100
+        }
+    }
+}

@@ -45,25 +45,25 @@ const App: React.FC = () => {
   // Initial data fetch from Strapi
   useEffect(() => {
     const initData = async () => {
-      try {
-        const [strapiProducts, strapiBlogs, strapiCustomers, strapiOrders] = await Promise.all([
-          api.getProducts(),
-          api.getBlogs(),
-          api.getCustomers(),
-          api.getOrders()
-        ]);
+      setLoading(true);
 
-        setProducts(strapiProducts || []);
-        setBlogs(strapiBlogs || []);
-        setCustomers(strapiCustomers || []);
-        setOrders(strapiOrders || []);
-        console.log('Products set in state:', strapiProducts); // DEBUG
-      } catch (error) {
-        console.error('Failed to fetch data from Strapi:', error);
-        // Data remains empty if CMS is unreachable
-      } finally {
-        setLoading(false);
-      }
+      const fetchData = async <T,>(fn: () => Promise<T>, setter: (val: T) => void, label: string) => {
+        try {
+          const result = await fn();
+          setter(result || [] as unknown as T);
+        } catch (error) {
+          console.error(`Failed to fetch ${label} from Strapi:`, error);
+        }
+      };
+
+      await Promise.all([
+        fetchData(api.getProducts, setProducts, 'products'),
+        fetchData(api.getBlogs, setBlogs, 'blogs'),
+        fetchData(api.getCustomers, setCustomers, 'customers'),
+        fetchData(api.getOrders, setOrders, 'orders')
+      ]);
+
+      setLoading(false);
     };
 
     initData();

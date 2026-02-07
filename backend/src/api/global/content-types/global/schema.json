@@ -37,6 +37,27 @@
         },
         "youtubeLink": {
             "type": "string"
+        },
+        "whyChooseUsTitle": {
+            "type": "string",
+            "default": "কেন আমরা সেরা?"
+        },
+        "whyChooseUsSubtitle": {
+            "type": "text",
+            "default": "১২ বছরের অভিজ্ঞতা এবং ১০০০+ সফল প্রজেক্টের অভিজ্ঞতা নিয়ে আমরা আপনাদের সেবায় নিয়োজিত।"
+        },
+        "howToOrderTitle": {
+            "type": "string",
+            "default": "কীভাবে অর্ডার করবেন?"
+        },
+        "howToOrderSubtitle": {
+            "type": "text",
+            "default": "সহজ ৪টি ধাপে আপনার পছন্দের পণ্যটি অর্ডার করুন"
+        },
+        "howToOrderSteps": {
+            "type": "component",
+            "repeatable": true,
+            "component": "homepage.order-step"
         }
     }
 }
