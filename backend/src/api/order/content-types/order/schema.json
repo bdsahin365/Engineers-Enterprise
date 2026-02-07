@@ -17,6 +17,12 @@
             "unique": true,
             "required": true
         },
+        "customer": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::customer.customer",
+            "inversedBy": "orders"
+        },
         "items": {
             "type": "json"
         },
