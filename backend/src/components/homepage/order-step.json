@@ -1,0 +1,23 @@
+{
+    "collectionName": "components_homepage_order_steps",
+    "info": {
+        "displayName": "Order Step",
+        "description": "Step in the ordering process"
+    },
+    "options": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text",
+            "required": true
+        },
+        "icon": {
+            "type": "string",
+            "required": true,
+            "default": "CheckCircle2"
+        }
+    }
+}

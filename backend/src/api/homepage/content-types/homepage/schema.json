@@ -5,7 +5,7 @@
         "singularName": "homepage",
         "pluralName": "homepages",
         "displayName": "Homepage",
-        "description": "Homepage content"
+        "description": "Homepage content and configuration"
     },
     "options": {
         "draftAndPublish": true
@@ -13,17 +13,24 @@
     "pluginOptions": {},
     "attributes": {
         "heroTitle": {
-            "type": "string"
+            "type": "string",
+            "required": true
         },
         "heroSubtitle": {
-            "type": "text"
+            "type": "string"
         },
         "heroImage": {
             "type": "media",
             "multiple": false,
+            "required": false,
             "allowedTypes": [
                 "images"
             ]
+        },
+        "featuredProduct": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::product.product"
         },
         "whatsappNumber": {
             "type": "string"
@@ -31,16 +38,25 @@
         "imoNumber": {
             "type": "string"
         },
-        "featuredProduct": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "api::product.product"
+        "features": {
+            "type": "component",
+            "repeatable": true,
+            "component": "homepage.feature"
         },
-        "whyChooseUs": {
-            "type": "json"
+        "stats": {
+            "type": "component",
+            "repeatable": true,
+            "component": "homepage.stat"
         },
         "orderSteps": {
-            "type": "json"
+            "type": "component",
+            "repeatable": true,
+            "component": "homepage.order-step"
+        },
+        "whyChooseUs": {
+            "type": "component",
+            "repeatable": true,
+            "component": "homepage.why-choose-us"
         }
     }
 }

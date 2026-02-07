@@ -1,0 +1,23 @@
+{
+    "collectionName": "components_homepage_why_choose_us",
+    "info": {
+        "displayName": "Why Choose Us",
+        "description": "Reason to choose us"
+    },
+    "options": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text",
+            "required": true
+        },
+        "icon": {
+            "type": "string",
+            "required": true,
+            "default": "Shield"
+        }
+    }
+}
