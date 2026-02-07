@@ -1,0 +1,42 @@
+{
+    "kind": "singleType",
+    "collectionName": "globals",
+    "info": {
+        "singularName": "global",
+        "pluralName": "globals",
+        "displayName": "Global",
+        "description": "Global site settings"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "siteName": {
+            "type": "string",
+            "default": "Engineers Enterprise"
+        },
+        "logo": {
+            "type": "media",
+            "multiple": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "contactPhone": {
+            "type": "string"
+        },
+        "contactEmail": {
+            "type": "email"
+        },
+        "address": {
+            "type": "text"
+        },
+        "facebookLink": {
+            "type": "string"
+        },
+        "youtubeLink": {
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "kind": "collectionType",
+    "collectionName": "orders",
+    "info": {
+        "singularName": "order",
+        "pluralName": "orders",
+        "displayName": "Order",
+        "description": "Sales orders"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "orderNo": {
+            "type": "string",
+            "unique": true,
+            "required": true
+        },
+        "items": {
+            "type": "json"
+        },
+        "totalPrice": {
+            "type": "decimal",
+            "required": true
+        },
+        "status": {
+            "type": "enumeration",
+            "enum": [
+                "DRAFT",
+                "CONFIRMED",
+                "DELIVERED"
+            ],
+            "default": "DRAFT"
+        },
+        "deliveryDate": {
+            "type": "date"
+        },
+        "deliveryAddress": {
+            "type": "text"
+        }
+    }
+}
