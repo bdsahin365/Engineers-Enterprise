@@ -48,6 +48,7 @@ const flattenData = (data: any): any => {
           return flattenData(item);
         });
       } else if (value.data !== null) {
+        // Single media field (like logo)
         if (value.data.attributes?.url) {
           flattened[key] = value.data.attributes.url.startsWith('http')
             ? value.data.attributes.url
@@ -63,7 +64,7 @@ const flattenData = (data: any): any => {
     }
   }
 
-  return { ...flattened, ...attributes }; // Merge any top-level keys just in case
+  return flattened;
 };
 
 export const api = {
@@ -125,10 +126,14 @@ export const api = {
 
 
   getProducts: async (): Promise<Product[]> => {
-    const response = await fetch(`${API_BASE}/products?populate=*`);
+    const response = await fetch(`${API_BASE}/products?populate=*`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch products');
     const json = await response.json();
-    return flattenData(json.data);
+    const flattened = flattenData(json.data);
+    console.log('Products from API:', flattened); // DEBUG
+    return flattened;
   },
 
   createProduct: async (product: Partial<Product>): Promise<Product> => {
@@ -254,21 +259,27 @@ export const api = {
   },
 
   getCategories: async (): Promise<CategoryItem[]> => {
-    const response = await fetch(`${API_BASE}/categories?populate=*`);
+    const response = await fetch(`${API_BASE}/categories?populate=*`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch categories');
     const json = await response.json();
     return flattenData(json.data);
   },
 
   getHomepage: async (): Promise<HomepageData> => {
-    const response = await fetch(`${API_BASE}/homepage?populate=*`);
+    const response = await fetch(`${API_BASE}/homepage?populate=*`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch homepage data');
     const json = await response.json();
     return flattenData(json.data);
   },
 
   getGlobal: async (): Promise<GlobalData> => {
-    const response = await fetch(`${API_BASE}/global?populate=*`);
+    const response = await fetch(`${API_BASE}/global?populate=*`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch global data');
     const json = await response.json();
     return flattenData(json.data);

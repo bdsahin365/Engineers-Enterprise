@@ -2,10 +2,30 @@
 import React from 'react';
 import { MapPin, Phone, MessageSquare, Mail, Send } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '../constants';
+import { api } from '../api';
+import { GlobalData } from '../types';
 
 const Contact: React.FC = () => {
+  const [globalData, setGlobalData] = React.useState<GlobalData | null>(null);
+
+  React.useEffect(() => {
+    const fetchGlobal = async () => {
+      try {
+        const data = await api.getGlobal();
+        setGlobalData(data);
+      } catch (error) {
+        console.error("Failed to fetch global data:", error);
+      }
+    };
+    fetchGlobal();
+  }, []);
+
+  const phone = globalData?.contactPhone || WHATSAPP_NUMBER;
+  const email = globalData?.contactEmail;
+  const address = globalData?.address || "উত্তরা হাউজ বিল্ডিং এর পাশে, উত্তরা, ঢাকা-১২৩০।";
+
   return (
-    <div className="bg-white py-20">
+    <div className="bg-white py-20 pb-24 md:pb-20">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           <div>
@@ -21,7 +41,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">কারখানা ও অফিস</h3>
-                  <p className="text-slate-600">উত্তরা হাউজ বিল্ডিং এর পাশে, উত্তরা, ঢাকা-১২৩০।</p>
+                  <p className="text-slate-600">{address}</p>
                 </div>
               </div>
 
@@ -31,7 +51,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">WhatsApp & IMO</h3>
-                  <p className="text-slate-600">{WHATSAPP_NUMBER}</p>
+                  <p className="text-slate-600">{phone}</p>
                 </div>
               </div>
 
@@ -44,6 +64,18 @@ const Contact: React.FC = () => {
                   <p className="text-slate-600">প্রতিদিন সকাল ৯টা থেকে রাত ৯টা পর্যন্ত।</p>
                 </div>
               </div>
+
+              {email && (
+                <div className="flex items-start gap-6">
+                  <div className="bg-purple-100 p-4 rounded-2xl text-purple-600">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">ইমেইল</h3>
+                    <p className="text-slate-600">{email}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

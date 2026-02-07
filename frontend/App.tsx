@@ -21,26 +21,22 @@ import AdminSettings from './pages/AdminSettings';
 import AdminCategories from './pages/AdminCategories';
 import AdminHomepage from './pages/AdminHomepage';
 import AdminGlobalSettings from './pages/AdminGlobalSettings';
-import AdminSeeder from './pages/AdminSeeder';
 import AIDesignAssistant from './components/AIDesignAssistant';
 import { Product, Order, Customer, UserRole, BlogPost } from './types';
-import { MOCK_PRODUCTS, MOCK_ORDERS, MOCK_CUSTOMERS, MOCK_BLOGS } from './constants';
 import { api } from './api';
 
 const App: React.FC = () => {
   const location = useLocation();
-  console.log("Current Path:", location.pathname); // DEBUG
   const isAdminPath = location.pathname.startsWith('/admin');
-  console.log("Is Admin Path:", isAdminPath); // DEBUG
 
   // Simulation of current user
   const [currentUser] = useState({ name: 'ম্যানেজার সাহেব', role: UserRole.ADMIN });
 
-  // State management
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
-  const [customers, setCustomers] = useState<Customer[]>(MOCK_CUSTOMERS);
-  const [blogs, setBlogs] = useState<BlogPost[]>(MOCK_BLOGS);
+  // State management - start empty, load from CMS
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Initial data fetch from Strapi
@@ -54,12 +50,14 @@ const App: React.FC = () => {
           api.getOrders()
         ]);
 
-        if (strapiProducts?.length) setProducts(strapiProducts);
-        if (strapiBlogs?.length) setBlogs(strapiBlogs);
-        if (strapiCustomers?.length) setCustomers(strapiCustomers);
-        if (strapiOrders?.length) setOrders(strapiOrders);
+        setProducts(strapiProducts || []);
+        setBlogs(strapiBlogs || []);
+        setCustomers(strapiCustomers || []);
+        setOrders(strapiOrders || []);
+        console.log('Products set in state:', strapiProducts); // DEBUG
       } catch (error) {
-        console.warn('Strapi not reachable, using mock data.', error);
+        console.error('Failed to fetch data from Strapi:', error);
+        // Data remains empty if CMS is unreachable
       } finally {
         setLoading(false);
       }
@@ -156,7 +154,6 @@ const App: React.FC = () => {
           <Route path="/admin/whatsapp" element={<AdminWhatsApp orders={orders} customers={customers} />} />
           <Route path="/admin/settings" element={<AdminSettings user={currentUser} />} />
           <Route path="/admin/content/global" element={<AdminGlobalSettings />} />
-          <Route path="/admin/seeder" element={<AdminSeeder />} />
         </Routes>
       </main>
 

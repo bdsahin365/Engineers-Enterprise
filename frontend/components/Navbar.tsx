@@ -11,6 +11,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const [globalData, setGlobalData] = React.useState<GlobalData | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     const fetchGlobal = async () => {
@@ -24,9 +25,13 @@ const Navbar: React.FC = () => {
     fetchGlobal();
   }, []);
 
+  // Hardcoded logo URL as constant - ALWAYS use this as fallback
+  const LOGO_URL = "https://dynamic-novelty-0723b13493.media.strapiapp.com/logo_a6d7338933.png";
+
   const whatsapp = globalData?.contactPhone || WHATSAPP_NUMBER;
   const displayTitle = globalData?.siteName || "Engineers Enterprise";
-
+  // Ensure logo always has a value - use CMS logo only if it exists and is a valid string
+  const logoUrl = (globalData?.logo && typeof globalData.logo === 'string' && globalData.logo.trim() !== '') ? globalData.logo : LOGO_URL;
 
   return (
     <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
@@ -35,13 +40,12 @@ const Navbar: React.FC = () => {
           {/* Logo Section */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2 group">
-              <div className="bg-blue-600 p-1.5 md:p-2 rounded-lg group-hover:bg-blue-700 transition-colors shadow-blue-100 shadow-lg">
-                <Hammer className="text-white w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-lg md:text-xl font-black text-slate-900 tracking-tight leading-none uppercase">{displayTitle.split(' ')[0]}</span>
-                <span className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-widest">{displayTitle.split(' ').slice(1).join(' ')}</span>
-              </div>
+              <img
+                src={logoUrl}
+                alt={displayTitle}
+                className="h-10 md:h-12 object-contain"
+              />
+              <span className="text-[10px] md:text-xs font-bold text-blue-600 uppercase tracking-widest">{displayTitle.split(' ').slice(1).join(' ')}</span>
             </Link>
           </div>
 
@@ -92,9 +96,9 @@ const Navbar: React.FC = () => {
             </a>
             <Link to="/admin" className="text-[10px] font-black uppercase text-slate-400">Admin</Link>
           </div>
-        </div>
-      </div>
-    </nav>
+        </div >
+      </div >
+    </nav >
   );
 };
 

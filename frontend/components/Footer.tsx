@@ -21,24 +21,30 @@ const Footer: React.FC = () => {
     fetchGlobal();
   }, []);
 
+  // Hardcoded logo URL as constant - ALWAYS use this as fallback
+  const LOGO_URL = "https://dynamic-novelty-0723b13493.media.strapiapp.com/logo_a6d7338933.png";
+
   const siteName = globalData?.siteName || "Engineers Enterprise";
   const address = globalData?.address;
   const phone = globalData?.contactPhone || "+৮৮০ ১৭XXXXXXXXX";
   const email = globalData?.contactEmail;
   const fbLink = globalData?.facebookLink || "#";
   const ytLink = globalData?.youtubeLink || "#";
+  // Ensure logo always has a value - use CMS logo only if it exists and is a valid string
+  const logoUrl = (globalData?.logo && typeof globalData.logo === 'string' && globalData.logo.trim() !== '') ? globalData.logo : LOGO_URL;
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
+    <footer className="bg-slate-900 text-white pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2 text-white">
-              <Hammer className="w-8 h-8 text-blue-500" />
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold tracking-tight uppercase">{siteName.split(' ')[0]}</span>
-                <span className="text-xs font-semibold text-blue-500 uppercase tracking-widest">{siteName.split(' ').slice(1).join(' ')}</span>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Company Info */}
+          <div>
+            <Link to="/" className="flex items-center space-x-2 mb-4">
+              <img
+                src={logoUrl}
+                alt={globalData?.siteName || "Engineers Enterprise"}
+                className="h-10 object-contain brightness-0 invert"
+              />
             </Link>
             <p className="text-sm leading-relaxed">
               {siteName} বাংলাদেশের নির্মাণ শিল্পের জন্য একটি বিশ্বস্ত নাম। আমরা উচ্চমানের ডেকোরেটিভ কংক্রিট ডিজাইন সরবরাহ করি।

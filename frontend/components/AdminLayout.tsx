@@ -19,7 +19,9 @@ interface Props {
 
 const AdminLayout: React.FC<Props> = ({ children, user, title, showBackButton }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -34,73 +36,105 @@ const AdminLayout: React.FC<Props> = ({ children, user, title, showBackButton })
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const fetchGlobalData = async () => {
+      try {
+        const globalData = await api.getGlobal();
+        if (globalData.logo) {
+          setLogoUrl(globalData.logo);
+        }
+      } catch (error) {
+        console.error('Failed to fetch global data:', error);
+      }
+    };
+    fetchGlobalData();
+  }, []);
+
   const menuItems = [
     { name: 'ড্যাশবোর্ড', path: '/admin', icon: LayoutDashboard },
     { name: 'অর্ডারসমূহ', path: '/admin/orders', icon: ShoppingBag },
     { name: 'গ্রাহক', path: '/admin/customers', icon: Users },
-    { name: 'ক্যাটাগরি', path: '/admin/categories', icon: FileText },
     { name: 'পণ্যসমূহ', path: '/admin/products', icon: Package },
-    { name: 'হোমপেজ', path: '/admin/content/home', icon: Home },
-    { name: 'গ্লোবাল', path: '/admin/content/global', icon: Globe },
-    { name: 'ব্লগ', path: '/admin/blog', icon: FileText },
-    { name: 'WhatsApp টুল', path: '/admin/whatsapp', icon: MessageSquare },
   ];
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white">
-      <div className="p-6 border-b">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-200">
-            <Hammer size={24} />
-          </div>
-          <div>
-            <h1 className="font-black text-slate-900 leading-none">ENGINEERS</h1>
-            <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Admin Panel</p>
-          </div>
+  const SidebarContent = ({ isCollapsed = false }: { isCollapsed?: boolean }) => (
+    <div className="flex flex-col h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className={`p-6 border-b border-slate-700/50 ${isCollapsed ? 'px-3' : ''}`}>
+        <Link to="/" className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo"
+              className={`${isCollapsed ? 'w-10 h-10' : 'h-10'} object-contain`}
+            />
+          ) : (
+            <>
+              <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/30">
+                <Hammer size={24} />
+              </div>
+              {!isCollapsed && (
+                <div>
+                  <h1 className="font-black text-white leading-none">ENGINEERS</h1>
+                  <p className="text-[10px] font-bold text-indigo-400 tracking-widest uppercase">Admin Panel</p>
+                </div>
+              )}
+            </>
+          )}
         </Link>
       </div>
 
-      <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-grow p-4 space-y-1 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold transition-all ${location.pathname === item.path
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-              }`}
+            className={`group flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold transition-all relative ${location.pathname === item.path
+              ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg shadow-indigo-500/30'
+              : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+              } ${isCollapsed ? 'justify-center' : ''}`}
           >
             <item.icon size={20} />
-            {item.name}
+            {!isCollapsed && <span>{item.name}</span>}
+            {isCollapsed && (
+              <div className="absolute left-full ml-2 px-3 py-2 bg-slate-800 text-white text-sm font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap shadow-xl z-50">
+                {item.name}
+              </div>
+            )}
           </Link>
         ))}
         {user.role === UserRole.ADMIN && (
-          <>
-            <Link to="/admin/seeder" className="flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-slate-500 hover:bg-slate-50">
-              <Database size={20} />
-              মাইগ্রেশন
-            </Link>
-            <Link to="/admin/settings" className="flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-slate-500 hover:bg-slate-50">
-              <Settings size={20} />
-              সেটিংস
-            </Link>
-          </>
+          <Link
+            to="/admin/settings"
+            className={`group flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all relative ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            <Settings size={20} />
+            {!isCollapsed && <span>সেটিংস</span>}
+            {isCollapsed && (
+              <div className="absolute left-full ml-2 px-3 py-2 bg-slate-800 text-white text-sm font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap shadow-xl z-50">
+                সেটিংস
+              </div>
+            )}
+          </Link>
         )}
       </nav>
 
-      <div className="p-4 border-t pb-24 md:pb-4">
-        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+      <div className={`p-4 border-t border-slate-700/50 pb-24 md:pb-4 ${isCollapsed ? 'px-2' : ''}`}>
+        <div className={`flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl backdrop-blur-sm ${isCollapsed ? 'justify-center' : ''}`}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center text-white font-bold border-2 border-slate-600 shadow-sm overflow-hidden flex-shrink-0">
             {user.name[0]}
           </div>
-          <div className="flex-grow overflow-hidden">
-            <p className="text-sm font-bold text-slate-900 leading-none truncate">{user.name}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">{user.role}</p>
-          </div>
-          <button className="text-slate-400 hover:text-red-500 p-1">
-            <LogOut size={18} />
-          </button>
+          {!isCollapsed && (
+            <>
+              <div className="flex-grow overflow-hidden">
+                <p className="text-sm font-bold text-white leading-none truncate">{user.name}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">{user.role}</p>
+              </div>
+              <button className="text-slate-400 hover:text-red-400 p-1 transition-colors">
+                <LogOut size={18} />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -109,15 +143,30 @@ const AdminLayout: React.FC<Props> = ({ children, user, title, showBackButton })
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row admin-theme">
       {/* Mobile Drawer */}
-      <div className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[110] md:hidden transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} onClick={() => setSidebarOpen(false)}>
-        <div className={`w-72 h-full bg-white shadow-2xl transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} onClick={e => e.stopPropagation()}>
+      <div className={`fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] md:hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} onClick={() => setSidebarOpen(false)}>
+        <div className={`w-72 h-full shadow-2xl transition-transform duration-300 ease-out transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} onClick={e => e.stopPropagation()}>
           <SidebarContent />
         </div>
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block w-72 bg-white border-r h-screen sticky top-0">
-        <SidebarContent />
+      <aside className={`hidden md:block ${isSidebarCollapsed ? 'w-20' : 'w-72'} bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 h-screen sticky top-0 transition-all duration-300`}>
+        <SidebarContent isCollapsed={isSidebarCollapsed} />
+        {/* Collapse Toggle Button */}
+        <button
+          onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+          className="absolute -right-3 top-20 bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-1.5 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-2 border-slate-900"
+        >
+          {isSidebarCollapsed ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          )}
+        </button>
       </aside>
 
       {/* Main Content */}

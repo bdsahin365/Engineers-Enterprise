@@ -5,14 +5,14 @@ export enum UserRole {
 }
 
 export enum Category {
-  PORCH_PILLAR = "পোরচ পিলার ডিজাইন",
-  CLEAR_COVERING = "ক্লিয়ার কভারিং ব্লক",
-  FANCY_BLOCK = "ফ্যান্সি ব্লক ডিজাইন",
-  WINDOW_PILLAR = "জানালার পাশের পিলার",
-  BALCONY_PILLAR = "ব্যালকনি পিলার ডিজাইন",
-  BALUSTER = "বালাস্টার ডিজাইন",
-  ROOF_CORNICE = "ছাদের কার্নিশ ডিজাইন",
-  OTHER = "অন্যান্য কংক্রিট ডিজাইন"
+  PORCH_PILLAR = "PORCH_PILLAR",
+  CLEAR_COVERING = "CLEAR_COVERING",
+  FANCY_BLOCK = "FANCY_BLOCK",
+  WINDOW_PILLAR = "WINDOW_PILLAR",
+  BALCONY_PILLAR = "BALCONY_PILLAR",
+  BALUSTER = "BALUSTER",
+  ROOF_CORNICE = "ROOF_CORNICE",
+  OTHER = "OTHER"
 }
 
 export interface PillarPart {
@@ -129,6 +129,16 @@ export interface HomepageData {
   whatsappNumber?: string;
   imoNumber?: string;
   featuredProduct?: Product;
+  features?: {
+    title: string;
+    description: string;
+    icon: string;
+  }[];
+  stats?: {
+    label: string;
+    value: string;
+    icon: string;
+  }[];
   whyChooseUs?: {
     title: string;
     description: string;

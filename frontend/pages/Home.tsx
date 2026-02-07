@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 import {
   MessageCircle, Phone, ArrowRight, ShieldCheck, Star,
   Construction, CheckCircle2, Ruler, Layout, Sparkles,
-  Award, HeartHandshake, Zap, ChevronRight, Truck, Shield, Clock, ArrowUpRight
+  Award, HeartHandshake, Zap, ChevronRight, Truck, Shield, Clock, ArrowUpRight, Package
 } from 'lucide-react';
 import { Category, HomepageData, CategoryItem } from '../types';
-import { WHATSAPP_NUMBER, IMO_NUMBER, MOCK_PRODUCTS } from '../constants';
+import { WHATSAPP_NUMBER, IMO_NUMBER } from '../constants';
 import { api } from '../api';
 import * as LucideIcons from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
@@ -61,9 +61,9 @@ const Home: React.FC = () => {
     );
   }
 
-  const featuredProduct = homepageData?.featuredProduct || MOCK_PRODUCTS[0];
+  const featuredProduct = homepageData?.featuredProduct;
   const heroTitle = homepageData?.heroTitle || "ডেকোরেটিভ কংক্রিট পিলার ও বিল্ডিং ডিজাইন";
-  const heroSubtitle = homepageData?.heroSubtitle || "মজবুত, টেকসই ও প্রিমিয়াম কংক্রিট কাজ।";
+  const heroSubtitle = homepageData?.heroSubtitle || "মজবুত, টেকসই ও প্রিমিয়াম কংক্রিট কাজ।";
 
   // Use CMS categories if available, otherwise fall back to enum
   const displayCategories = categories.length > 0
@@ -87,14 +87,14 @@ const Home: React.FC = () => {
     { title: "অর্ডার সম্পন্ন", desc: "দাম এবং ডেলিভারি সময় কনফার্ম করে অর্ডারটি নিশ্চিত করুন।", icon: CheckCircle2 }
   ];
 
-  console.log("Rendering Home Component"); // DEBUG
+
   return (
     <div className="pb-20 md:pb-0">
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center bg-slate-900 text-white overflow-hidden pt-10">
         <div className="absolute inset-0 opacity-40">
           <img
-            src="https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=1920"
+            src={homepageData?.heroImage || "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=1920"}
             alt="Construction background"
             className="w-full h-full object-cover"
           />
@@ -177,7 +177,7 @@ const Home: React.FC = () => {
                   <DynamicIcon name={cat.icon || "Layout"} className="text-blue-600 group-hover:text-white" size={28} />
                 </div>
                 <h3 className="font-black text-xl leading-tight text-slate-900 group-hover:text-white mb-2">{cat.name}</h3>
-                <p className="text-slate-400 text-sm group-hover:text-blue-100 mb-6 font-medium">{cat.description || "প্রিমিয়াম কোয়ালিটি ডেকোরেশন"}</p>
+                <p className="text-slate-400 text-sm group-hover:text-blue-100 mb-6 font-medium">{cat.description || "প্রিমিয়াম কোয়ালিটি ডেকোরেশন"}</p>
                 <div className="text-blue-600 group-hover:text-white inline-flex items-center text-sm font-black uppercase tracking-widest">
                   সংগ্রহ দেখুন <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -188,47 +188,55 @@ const Home: React.FC = () => {
       </section>
 
       {/* Featured Product Section */}
-      <section className="py-24 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white rounded-[48px] overflow-hidden shadow-2xl border border-slate-100 flex flex-col lg:flex-row items-stretch">
-            <div className="lg:w-1/2 aspect-square lg:aspect-auto">
-              <img
-                src={featuredProduct.images[0]}
-                alt={featuredProduct.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6">
-                <Star size={14} fill="currentColor" /> জনপ্রিয় পণ্য
+      {featuredProduct && (
+        <section className="py-24 bg-slate-50 border-y border-slate-100">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="bg-white rounded-[48px] overflow-hidden shadow-2xl border border-slate-100 flex flex-col lg:flex-row items-stretch">
+              <div className="lg:w-1/2 aspect-square lg:aspect-auto">
+                {featuredProduct.images && featuredProduct.images.length > 0 ? (
+                  <img
+                    src={featuredProduct.images[0]}
+                    alt={featuredProduct.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-slate-100 to-blue-50 flex items-center justify-center">
+                    <Package className="text-slate-300" size={96} />
+                  </div>
+                )}
               </div>
-              <h2 className="text-4xl font-black text-slate-900 mb-4">{featuredProduct.name}</h2>
-              <div className="text-slate-400 font-mono text-sm mb-6">Model: {featuredProduct.modelNo}</div>
-              <p className="text-slate-600 text-lg leading-relaxed mb-8 font-medium">
-                ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।
-              </p>
+              <div className="lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6">
+                  <Star size={14} fill="currentColor" /> জনপ্রিয় পণ্য
+                </div>
+                <h2 className="text-4xl font-black text-slate-900 mb-4">{featuredProduct.name}</h2>
+                <div className="text-slate-400 font-mono text-sm mb-6">Model: {featuredProduct.modelNo}</div>
+                <p className="text-slate-600 text-lg leading-relaxed mb-8 font-medium">
+                  ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।
+                </p>
 
-              <div className="space-y-4 mb-10">
-                <div className="flex items-center gap-3 text-slate-700 font-bold">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><CheckCircle2 size={16} /></div>
-                  হাই-গ্রেড কংক্রিট ম্যাটেরিয়াল
+                <div className="space-y-4 mb-10">
+                  <div className="flex items-center gap-3 text-slate-700 font-bold">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><CheckCircle2 size={16} /></div>
+                    হাই-গ্রেড কংক্রিট ম্যাটেরিয়াল
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-700 font-bold">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><CheckCircle2 size={16} /></div>
+                    কাস্টমাইজড সাইজ অপশন
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-slate-700 font-bold">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><CheckCircle2 size={16} /></div>
-                  কাস্টমাইজড সাইজ অপশন
-                </div>
+
+                <Link
+                  to={`/products/${featuredProduct.id}`}
+                  className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3 active:scale-95"
+                >
+                  পণ্যের বিস্তারিত দেখুন <ArrowRight size={20} />
+                </Link>
               </div>
-
-              <Link
-                to={`/products/${featuredProduct.id}`}
-                className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3 active:scale-95"
-              >
-                পণ্যের বিস্তারিত দেখুন <ArrowRight size={20} />
-              </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Why Engineers Enterprise */}
       <section className="py-24 bg-white">
