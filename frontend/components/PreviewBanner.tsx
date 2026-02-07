@@ -1,11 +1,12 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { usePreview } from '../contexts/PreviewContext';
 
-interface PreviewBannerProps {
-    onExit: () => void;
-}
+export const PreviewBanner: React.FC = () => {
+    const { isPreview, disablePreview } = usePreview();
 
-export const PreviewBanner: React.FC<PreviewBannerProps> = ({ onExit }) => {
+    if (!isPreview) return null;
+
     return (
         <div className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -18,7 +19,7 @@ export const PreviewBanner: React.FC<PreviewBannerProps> = ({ onExit }) => {
                     </p>
                 </div>
                 <button
-                    onClick={onExit}
+                    onClick={disablePreview}
                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors font-medium text-sm"
                 >
                     <X size={16} />

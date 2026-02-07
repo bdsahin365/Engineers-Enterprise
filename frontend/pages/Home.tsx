@@ -12,14 +12,28 @@ import { api } from '../api';
 import * as LucideIcons from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
 import DynamicIcon from '../components/DynamicIcon';
+import { usePreview } from '../contexts/PreviewContext';
 
 const Home: React.FC = () => {
+  const { isPreview, previewData } = usePreview();
   const [homepageData, setHomepageData] = React.useState<HomepageData | null>(null);
   const [categories, setCategories] = React.useState<CategoryItem[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchData = async () => {
+      // If we're in preview mode and have data for the homepage, use it!
+      if (isPreview && previewData && previewData.heroTitle) {
+        setHomepageData(previewData);
+        setLoading(false);
+        // We still fetch categories as they might not be part of the preview payload
+        try {
+          const cats = await api.getCategories();
+          setCategories(cats);
+        } catch (e) { }
+        return;
+      }
+
       try {
         const [home, cats] = await Promise.all([
           api.getHomepage(),
@@ -34,7 +48,7 @@ const Home: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [isPreview, previewData]);
 
   if (loading) {
     return (
@@ -79,13 +93,63 @@ const Home: React.FC = () => {
   const whatsapp = homepageData?.whatsappNumber || WHATSAPP_NUMBER;
   const imo = homepageData?.imoNumber || IMO_NUMBER;
 
+  // Icons mapping for CMS components
+  const iconMap: Record<string, any> = {
+    Layout, MessageCircle, Ruler, CheckCircle2, Star, ShieldCheck, Award, Zap, HeartHandshake, Construction, Shield, Clock, Truck, Package, Phone
+  };
 
-  const orderSteps = [
-    { title: "পছন্দের পণ্য দেখুন", desc: "আমাদের গ্যালারি থেকে আপনার পছন্দের ডিজাইনটি বাছাই করুন।", icon: Layout },
-    { title: "সরাসরি যোগাযোগ", desc: "WhatsApp বা IMO-তে আমাদের সাথে কথা বলে বিস্তারিত জেনে নিন।", icon: MessageCircle },
-    { title: "মাপ ও পরিমাণ", desc: "আপনার প্রয়োজনীয় সাইজ এবং কত পিস লাগবে তা আমাদের জানান।", icon: Ruler },
-    { title: "অর্ডার সম্পন্ন", desc: "দাম এবং ডেলিভারি সময় কনফার্ম করে অর্ডারটি নিশ্চিত করুন।", icon: CheckCircle2 }
+  const getIcon = (name: string, fallback: any) => {
+    return iconMap[name] || fallback;
+  };
+
+  const features = homepageData?.features?.length ? homepageData.features.map(f => ({
+    ...f,
+    icon: getIcon(f.icon, Construction)
+  })) : [
+    { title: "নিজস্ব কারখানায় উৎপাদন", icon: Construction, description: "নিজেদের কন্ট্রোলে তৈরি হয় বিধায় আমরা কোয়ালিটি নিয়ে নিশ্চিত থাকি।" },
+    { title: "শক্ত ও টেকসই কংক্রিট", icon: ShieldCheck, description: "উন্নত মানের সিমেন্ট ও পাথর ব্যবহারে আমরা কোনো আপোষ করি না।" },
+    { title: "অভিজ্ঞ কারিগরের কাজ", icon: Award, description: "দীর্ঘ এক দশকের অভিজ্ঞ কারিগরদের নিপুণ হাতের নিখুঁত ফিনিশিং।" },
+    { title: "কাস্টম ডিজাইন সুবিধা", icon: Ruler, description: "আপনার বাড়ির স্থাপত্য অনুযায়ী ডিজাইন কাস্টমাইজ করার সুবিধা।" },
+    { title: "যুক্তিসঙ্গত দাম", icon: Zap, description: "সরাসরি কারখানা থেকে সরবরাহ করায় আমরা সাশ্রয়ী মূল্য দিতে পারি।" },
+    { title: "বিশ্বস্ত সার্ভিস", icon: HeartHandshake, description: "অর্ডার থেকে ডেলিভারি পর্যন্ত প্রতিটি পদক্ষেপে আমরা বিশ্বস্ত।" }
   ];
+
+  const orderSteps = homepageData?.orderSteps?.length ? homepageData.orderSteps.map(s => ({
+    ...s,
+    icon: getIcon(s.icon, Layout)
+  })) : [
+    { title: "পছন্দের পণ্য দেখুন", description: "আমাদের গ্যালারি থেকে আপনার পছন্দের ডিজাইনটি বাছাই করুন।", icon: Layout },
+    { title: "সরাসরি যোগাযোগ", description: "WhatsApp বা IMO-তে আমাদের সাথে কথা বলে বিস্তারিত জেনে নিন।", icon: MessageCircle },
+    { title: "মাপ ও পরিমাণ", description: "আপনার প্রয়োজনীয় সাইজ এবং কত পিস লাগবে তা আমাদের জানান।", icon: Ruler },
+    { title: "অর্ডার সম্পন্ন", description: "দাম এবং ডেলিভারি সময় কনফার্ম করে অর্ডারটি নিশ্চিত করুন।", icon: CheckCircle2 }
+  ];
+
+  const stats = homepageData?.stats?.map(s => ({
+    ...s,
+    icon: getIcon(s.icon, Star)
+  })) || [];
+
+  const heroBadge = homepageData?.heroBadge || "বাংলাদেশি পরিবেশ উপযোগী ডিজাইন";
+  const featuredProductTitle = homepageData?.featuredProductTitle || "জনপ্রিয় পণ্য";
+  const featuredProductSubtitle = homepageData?.featuredProductDescription || "ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।";
+
+  const categoriesTitle = homepageData?.categoriesTitle || "আমাদের পণ্যসমূহ";
+  const categoriesSubtitle = homepageData?.categoriesSubtitle || "বাড়ি, বারান্দা ও বিল্ডিংয়ের সৌন্দর্য বাড়াতে আমাদের রয়েছে বিভিন্ন ডেকোরেটিভ কংক্রিট পণ্য। সেরা ডিজাইনের গ্যারান্টি।";
+
+  const featuresTitle = homepageData?.featuresTitle || "কেন Engineers Enterprise বেছে নেবেন?";
+  const featuresSubtitle = homepageData?.featuresSubtitle || "আমরা সুন্দর ডিজাইনের পাশাপাশি গুণগত মানকে সবচেয়ে বেশি গুরুত্ব দিই।";
+
+  const orderStepsTitle = homepageData?.orderStepsTitle || "কিভাবে অর্ডার করবেন?";
+  const orderStepsSubtitle = homepageData?.orderStepsSubtitle || "সরাসরি আলোচনার মাধ্যমে ঝামেলামুক্ত অর্ডার করার পদ্ধতি";
+  const orderStepsNote = homepageData?.orderStepsNote || "বিঃদ্রঃ: অনলাইন পেমেন্ট প্রয়োজন নেই – সরাসরি যোগাযোগ করে অর্ডার করুন।";
+
+  const trustTitle = homepageData?.emotionalTrustTitle || "আপনার বাড়ির সৌন্দর্য, আমাদের দায়িত্ব";
+  const trustDescription = homepageData?.emotionalTrustDescription || "আমরা বিশ্বাস করি একটি সুন্দর বাড়ি মানে শুধু ডিজাইন নয়, বরং শক্ত কাঠামো ও নির্ভরযোগ্য কাজ। প্রতিটি ইটের গাথুনি যেমন জরুরি, পিলারের সৌন্দর্য ঠিক তেমনি একটি বাড়ির পূর্ণতা আনে। Engineers Enterprise আপনার সেই বিশ্বাসের জায়গা।";
+  const trustQuote = homepageData?.emotionalTrustQuote || "আমরা শুধু ম্যাটেরিয়াল বিক্রি করি না, আমরা আপনার স্বপ্নের সহযোগী।";
+  const trustImage = homepageData?.emotionalTrustImage || "https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?auto=format&fit=crop&q=80&w=800";
+
+  const blogTitle = homepageData?.blogTitle || "জানুন ও বুঝে নিন";
+  const blogSubtitle = homepageData?.blogSubtitle || "পিলার, ফ্যান্সি ব্লক ও কংক্রিট ডিজাইন সম্পর্কিত টিপস ও গাইড।";
 
 
   return (
@@ -105,18 +169,17 @@ const Home: React.FC = () => {
           <div className="max-w-2xl space-y-8 animate-in slide-in-from-left duration-1000">
             <div className="inline-flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-full backdrop-blur-md">
               <Sparkles size={16} className="text-blue-400" />
-              <span className="text-xs font-black uppercase tracking-widest text-blue-300">বাংলাদেশি পরিবেশ উপযোগী ডিজাইন</span>
+              <span className="text-xs font-black uppercase tracking-widest text-blue-300">{heroBadge}</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
               {heroTitle.split(' ').map((word, i) =>
-                word.includes('পিলার') ? <span key={i} className="text-blue-500 block md:inline">{word} </span> : word + " "
+                word.includes('পিলার') || word.includes('কংক্রিট') ? <span key={i} className="text-blue-500 block md:inline">{word} </span> : word + " "
               )}
             </h1>
 
             <p className="text-lg md:text-2xl text-slate-300 leading-relaxed font-medium">
-              {heroSubtitle} <br className="hidden md:block" />
-              <span className="text-slate-400 font-normal">Porch Pillar • Fancy Block • Baluster • Roof Cornice</span>
+              {heroSubtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -153,9 +216,9 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="max-w-xl">
-              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">আমাদের পণ্যসমূহ</h2>
+              <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">{categoriesTitle}</h2>
               <p className="text-slate-500 text-lg font-medium leading-relaxed">
-                বাড়ি, বারান্দা ও বিল্ডিংয়ের সৌন্দর্য বাড়াতে আমাদের রয়েছে বিভিন্ন ডেকোরেটিভ কংক্রিট পণ্য। সেরা ডিজাইনের গ্যারান্টি।
+                {categoriesSubtitle}
               </p>
             </div>
             <Link to="/products" className="group flex items-center gap-2 text-blue-600 font-black text-lg hover:gap-4 transition-all">
@@ -207,12 +270,12 @@ const Home: React.FC = () => {
               </div>
               <div className="lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
                 <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6">
-                  <Star size={14} fill="currentColor" /> জনপ্রিয় পণ্য
+                  <Star size={14} fill="currentColor" /> {featuredProductTitle}
                 </div>
                 <h2 className="text-4xl font-black text-slate-900 mb-4">{featuredProduct.name}</h2>
                 <div className="text-slate-400 font-mono text-sm mb-6">Model: {featuredProduct.modelNo}</div>
                 <p className="text-slate-600 text-lg leading-relaxed mb-8 font-medium">
-                  ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom আলাদা ভাবে পাওয়া যায়। Middle অংশ রানিং ফুট অনুযায়ী কাস্টম করা সম্ভব। আমাদের নিখুঁত ফিনিশিং আপনার বাড়ির লুকে পরিবর্তন নিয়ে আসবে।
+                  {featuredProductSubtitle}
                 </p>
 
                 <div className="space-y-4 mb-10">
@@ -242,26 +305,19 @@ const Home: React.FC = () => {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-black text-slate-900 mb-4">কেন Engineers Enterprise বেছে নেবেন?</h2>
-            <p className="text-slate-500 font-medium max-w-2xl mx-auto text-lg">আমরা সুন্দর ডিজাইনের পাশাপাশি গুণগত মানকে সবচেয়ে বেশি গুরুত্ব দিই।</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-4">{featuresTitle}</h2>
+            <p className="text-slate-500 font-medium max-w-2xl mx-auto text-lg">{featuresSubtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {[
-              { title: "নিজস্ব কারখানায় উৎপাদন", icon: Construction, desc: "নিজেদের কন্ট্রোলে তৈরি হয় বিধায় আমরা কোয়ালিটি নিয়ে নিশ্চিত থাকি।" },
-              { title: "শক্ত ও টেকসই কংক্রিট", icon: ShieldCheck, desc: "উন্নত মানের সিমেন্ট ও পাথর ব্যবহারে আমরা কোনো আপোষ করি না।" },
-              { title: "অভিজ্ঞ কারিগরের কাজ", icon: Award, desc: "দীর্ঘ এক দশকের অভিজ্ঞ কারিগরদের নিপুণ হাতের নিখুঁত ফিনিশিং।" },
-              { title: "কাস্টম ডিজাইন সুবিধা", icon: Ruler, desc: "আপনার বাড়ির স্থাপত্য অনুযায়ী ডিজাইন কাস্টমাইজ করার সুবিধা।" },
-              { title: "যুক্তিসঙ্গত দাম", icon: Zap, desc: "সরাসরি কারখানা থেকে সরবরাহ করায় আমরা সাশ্রয়ী মূল্য দিতে পারি।" },
-              { title: "বিশ্বস্ত সার্ভিস", icon: HeartHandshake, desc: "অর্ডার থেকে ডেলিভারি পর্যন্ত প্রতিটি পদক্ষেপে আমরা বিশ্বস্ত।" }
-            ].map((item, idx) => (
+            {features.map((item, idx) => (
               <div key={idx} className="flex gap-6 p-8 bg-slate-50 rounded-3xl hover:bg-white hover:shadow-xl transition-all group">
                 <div className="bg-white p-4 rounded-2xl text-blue-600 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all h-fit">
                   <item.icon size={28} />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-black text-slate-900 leading-tight">{item.title}</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+                  <p className="text-slate-500 font-medium leading-relaxed">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -289,7 +345,7 @@ const Home: React.FC = () => {
                   </div>
                   <div className="absolute top-6 right-6 text-4xl font-black text-white/10">{idx + 1}</div>
                   <h3 className="font-black text-xl mb-4 text-white leading-tight">{step.title}</h3>
-                  <p className="text-slate-400 font-medium text-sm leading-relaxed">{step.desc}</p>
+                  <p className="text-slate-400 font-medium text-sm leading-relaxed">{step.description}</p>
                 </div>
                 {idx < 3 && <div className="hidden lg:block absolute top-1/2 -right-4 translate-y-[-50%] text-white/10"><ArrowRight size={32} /></div>}
               </div>
@@ -298,7 +354,7 @@ const Home: React.FC = () => {
 
           <div className="mt-16 text-center">
             <div className="inline-block bg-slate-800/50 border border-slate-700 px-6 py-3 rounded-2xl text-slate-400 font-bold text-sm italic">
-              বিঃদ্রঃ: অনলাইন পেমেন্ট প্রয়োজন নেই – সরাসরি যোগাযোগ করে অর্ডার করুন।
+              {orderStepsNote}
             </div>
           </div>
         </div>
@@ -310,22 +366,25 @@ const Home: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="md:w-1/2 relative">
               <div className="relative z-10 rounded-[40px] overflow-hidden shadow-2xl">
-                <img src="https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?auto=format&fit=crop&q=80&w=800" alt="Beautiful house" className="w-full h-full object-cover" />
+                <img src={trustImage} alt="Beautiful house" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-50 -z-10 rounded-full"></div>
               <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-slate-100 -z-10 rounded-full"></div>
             </div>
             <div className="md:w-1/2 space-y-8">
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">আপনার বাড়ির সৌন্দর্য, <span className="text-blue-600 italic">আমাদের দায়িত্ব</span></h2>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
+                {trustTitle.split(',').map((part, i) =>
+                  i === 1 ? <span key={i} className="text-blue-600 italic">, {part}</span> : part
+                )}
+              </h2>
               <div className="space-y-6 text-lg text-slate-600 font-medium leading-relaxed">
-                <p>আমরা বিশ্বাস করি একটি সুন্দর বাড়ি মানে শুধু ডিজাইন নয়, বরং শক্ত কাঠামো ও নির্ভরযোগ্য কাজ। প্রতিটি ইটের গাথুনি যেমন জরুরি, পিলারের সৌন্দর্য ঠিক তেমনি একটি বাড়ির পূর্ণতা আনে।</p>
-                <p>Engineers Enterprise আপনার সেই বিশ্বাসের জায়গা। আমরা আপনার স্বপ্নের বাড়িকে এমনভাবে সাজাই যা প্রজন্মের পর প্রজন্ম গর্বের প্রতীক হয়ে থাকবে।</p>
+                <p>{trustDescription}</p>
               </div>
               <div className="flex items-center gap-4 p-6 bg-blue-50 rounded-3xl border border-blue-100">
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shrink-0 shadow-lg">
                   <Award size={24} />
                 </div>
-                <div className="text-sm font-bold text-blue-900 italic">"আমরা শুধু ম্যাটেরিয়াল বিক্রি করি না, আমরা আপনার স্বপ্নের সহযোগী।"</div>
+                <div className="text-sm font-bold text-blue-900 italic">"{trustQuote}"</div>
               </div>
             </div>
           </div>
@@ -340,11 +399,11 @@ const Home: React.FC = () => {
             <p className="opacity-90 font-medium">আমাদের এক্সপার্ট আপনাকে সঠিক ডিজাইনটি বেছে নিতে সাহায্য করবে</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href={`tel:${WHATSAPP_NUMBER}`} className="flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-2xl font-black shadow-2xl hover:bg-slate-50 transition-all active:scale-95">
+            <a href={`tel:${whatsapp}`} className="flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-2xl font-black shadow-2xl hover:bg-slate-50 transition-all active:scale-95">
               <Phone size={20} />
               <span>কল করুন</span>
             </a>
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} className="flex items-center space-x-3 bg-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-2xl hover:bg-green-600 transition-all active:scale-95">
+            <a href={`https://wa.me/${whatsapp}`} className="flex items-center space-x-3 bg-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-2xl hover:bg-green-600 transition-all active:scale-95">
               <MessageCircle size={20} />
               <span>WhatsApp</span>
             </a>
@@ -357,8 +416,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-end mb-16 gap-4">
             <div>
-              <h2 className="text-4xl font-black text-slate-900 mb-4">জানুন ও বুঝে নিন</h2>
-              <p className="text-slate-500 font-medium text-lg">পিলার, ফ্যান্সি ব্লক ও কংক্রিট ডিজাইন সম্পর্কিত টিপস ও গাইড।</p>
+              <h2 className="text-4xl font-black text-slate-900 mb-4">{blogTitle}</h2>
+              <p className="text-slate-500 font-medium text-lg">{blogSubtitle}</p>
             </div>
             <Link to="/blog" className="hidden md:flex items-center gap-2 text-blue-600 font-black hover:gap-3 transition-all">
               সব ব্লগ পড়ুন <ArrowRight size={20} />

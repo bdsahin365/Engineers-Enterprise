@@ -22,6 +22,9 @@ import AdminCategories from './pages/AdminCategories';
 import AdminHomepage from './pages/AdminHomepage';
 import AdminGlobalSettings from './pages/AdminGlobalSettings';
 import AIDesignAssistant from './components/AIDesignAssistant';
+import Preview from './pages/Preview';
+import { PreviewProvider } from './contexts/PreviewContext';
+import { PreviewBanner } from './components/PreviewBanner';
 import { Product, Order, Customer, UserRole, BlogPost } from './types';
 import { api } from './api';
 
@@ -132,36 +135,40 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {!isAdminPath && <Navbar />}
+    <PreviewProvider>
+      <div className="flex flex-col min-h-screen">
+        {!isAdminPath && <PreviewBanner />}
+        {!isAdminPath && <Navbar />}
 
-      <main className="flex-grow">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products products={products} />} />
-          <Route path="/products/:id" element={<ProductDetails products={products} />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/contact" element={<Contact />} />
+        <main className="flex-grow">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products products={products} />} />
+            <Route path="/products/:id" element={<ProductDetails products={products} />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/preview" element={<Preview />} />
 
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard orders={orders} customers={customers} products={products} user={currentUser} />} />
-          <Route path="/admin/orders" element={<AdminOrders orders={orders} products={products} customers={customers} onAddOrder={handleAddOrder} user={currentUser} />} />
-          <Route path="/admin/customers" element={<AdminCustomers customers={customers} onAddCustomer={handleAddCustomer} onUpdateCustomer={handleUpdateCustomer} />} />
-          <Route path="/admin/products" element={<AdminProducts products={products} onAddProduct={handleAddProduct} onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} />} />
-          <Route path="/admin/invoices/:id" element={<AdminInvoices orders={orders} products={products} customers={customers} />} />
-          <Route path="/admin/blog" element={<AdminBlog blogs={blogs} onUpdateBlogs={setBlogs} />} />
-          <Route path="/admin/whatsapp" element={<AdminWhatsApp orders={orders} customers={customers} />} />
-          <Route path="/admin/settings" element={<AdminSettings user={currentUser} />} />
-          <Route path="/admin/content/global" element={<AdminGlobalSettings />} />
-        </Routes>
-      </main>
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard orders={orders} customers={customers} products={products} user={currentUser} />} />
+            <Route path="/admin/orders" element={<AdminOrders orders={orders} products={products} customers={customers} onAddOrder={handleAddOrder} user={currentUser} />} />
+            <Route path="/admin/customers" element={<AdminCustomers customers={customers} onAddCustomer={handleAddCustomer} onUpdateCustomer={handleUpdateCustomer} />} />
+            <Route path="/admin/products" element={<AdminProducts products={products} onAddProduct={handleAddProduct} onUpdateProduct={handleUpdateProduct} onDeleteProduct={handleDeleteProduct} />} />
+            <Route path="/admin/invoices/:id" element={<AdminInvoices orders={orders} products={products} customers={customers} />} />
+            <Route path="/admin/blog" element={<AdminBlog blogs={blogs} onUpdateBlogs={setBlogs} />} />
+            <Route path="/admin/whatsapp" element={<AdminWhatsApp orders={orders} customers={customers} />} />
+            <Route path="/admin/settings" element={<AdminSettings user={currentUser} />} />
+            <Route path="/admin/content/global" element={<AdminGlobalSettings />} />
+          </Routes>
+        </main>
 
-      {!isAdminPath && <Footer />}
-      {!isAdminPath && <AIDesignAssistant products={products} />}
-      {!isAdminPath && <BottomNav />}
-      <Toaster position="top-right" richColors />
-    </div>
+        {!isAdminPath && <Footer />}
+        {!isAdminPath && <AIDesignAssistant products={products} />}
+        {!isAdminPath && <BottomNav />}
+        <Toaster position="top-right" richColors />
+      </div>
+    </PreviewProvider>
   );
 };
 

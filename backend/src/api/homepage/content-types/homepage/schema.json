@@ -19,6 +19,9 @@
         "heroSubtitle": {
             "type": "string"
         },
+        "heroBadge": {
+            "type": "string"
+        },
         "heroImage": {
             "type": "media",
             "multiple": false,
@@ -31,6 +34,62 @@
             "type": "relation",
             "relation": "oneToOne",
             "target": "api::product.product"
+        },
+        "featuredProductTitle": {
+            "type": "string"
+        },
+        "featuredProductDescription": {
+            "type": "text"
+        },
+        "categoriesTitle": {
+            "type": "string"
+        },
+        "categoriesSubtitle": {
+            "type": "text"
+        },
+        "featuresTitle": {
+            "type": "string"
+        },
+        "featuresSubtitle": {
+            "type": "text"
+        },
+        "orderStepsTitle": {
+            "type": "string"
+        },
+        "orderStepsSubtitle": {
+            "type": "text"
+        },
+        "orderStepsNote": {
+            "type": "text"
+        },
+        "emotionalTrustTitle": {
+            "type": "string"
+        },
+        "emotionalTrustDescription": {
+            "type": "text"
+        },
+        "emotionalTrustQuote": {
+            "type": "string"
+        },
+        "emotionalTrustImage": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "blogTitle": {
+            "type": "string"
+        },
+        "blogSubtitle": {
+            "type": "text"
+        },
+        "statsTitle": {
+            "type": "string"
+        },
+        "statsSubtitle": {
+            "type": "text"
         },
         "whatsappNumber": {
             "type": "string"

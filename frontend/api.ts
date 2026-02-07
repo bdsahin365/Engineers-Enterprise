@@ -28,9 +28,9 @@ const flattenData = (data: any): any => {
   }
 
   const id = data.id;
-  const attributes = data.attributes || data; // Handle cases where data is already flat or nested
+  const attributes = data.attributes || data;
 
-  const flattened: any = { id: id ? id.toString() : undefined }; // Handle missing ID cases gracefully
+  const flattened: any = { id: id ? id.toString() : undefined };
 
   for (const key in attributes) {
     const value = attributes[key];
@@ -41,25 +41,30 @@ const flattenData = (data: any): any => {
         flattened[key] = value.data.map((item: any) => {
           // Special case for Strapi images
           if (item.attributes?.url) {
-            return item.attributes.url.startsWith('http')
-              ? item.attributes.url
-              : `${STRAPI_URL}${item.attributes.url}`;
+            const url = item.attributes.url;
+            return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
           }
           return flattenData(item);
         });
       } else if (value.data !== null) {
-        // Single media field (like logo)
+        // Single media field (like logo, heroImage)
         if (value.data.attributes?.url) {
-          flattened[key] = value.data.attributes.url.startsWith('http')
-            ? value.data.attributes.url
-            : `${STRAPI_URL}${value.data.attributes.url}`;
+          const url = value.data.attributes.url;
+          flattened[key] = url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
         } else {
           flattened[key] = flattenData(value.data);
         }
       } else {
         flattened[key] = null;
       }
-    } else {
+    }
+    // Handle already-flattened media (Strapi sometimes returns flat objects with url property)
+    else if (value && typeof value === 'object' && value.url && typeof value.url === 'string') {
+      // This is an already-flattened image object
+      const url = value.url;
+      flattened[key] = url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+    }
+    else {
       flattened[key] = value;
     }
   }
@@ -325,5 +330,23 @@ export const api = {
     }
     const json = await response.json();
     return flattenData(json.data);
-  }
+  },
+
+  getDraftContent: async (contentType: string, id: string): Promise<any> => {
+    // contentType is like "api::homepage.homepage" or "api::product.product"
+    // We need to extract the plural name
+    let endpoint = contentType.split('.').pop() || '';
+    if (endpoint === 'homepage') endpoint = 'homepage'; // Single type names stay the same
+    if (endpoint === 'global') endpoint = 'global';
+
+    // Strapi 4/5 draft fetching
+    const url = `${API_BASE}/${endpoint}?publicationState=preview&populate=*`;
+    const response = await fetch(url, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error(`Failed to fetch draft for ${contentType}`);
+    const json = await response.json();
+    return flattenData(json.data);
+  },
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Save, Upload, Image as ImageIcon, Plus, Trash2, Layout, MessageCircle } from 'lucide-react';
+import { Save, Upload, Image as ImageIcon, Plus, Trash2, Layout, MessageCircle, Star } from 'lucide-react';
 import ImageUploader from '../components/ui/ImageUploader';
 import { HomepageData, Product } from '../types';
 import AdminLayout from '../components/AdminLayout';
@@ -12,11 +12,30 @@ export default function AdminHomepage() {
         heroTitle: '',
         heroSubtitle: '',
         heroImage: '',
+        heroBadge: '',
         whatsappNumber: '',
         imoNumber: '',
         featuredProduct: undefined,
+        featuredProductTitle: '',
+        featuredProductDescription: '',
+        categoriesTitle: '',
+        categoriesSubtitle: '',
+        featuresTitle: '',
+        featuresSubtitle: '',
         whyChooseUs: [],
-        orderSteps: []
+        orderStepsTitle: '',
+        orderStepsSubtitle: '',
+        orderStepsNote: '',
+        orderSteps: [],
+        emotionalTrustTitle: '',
+        emotionalTrustDescription: '',
+        emotionalTrustQuote: '',
+        emotionalTrustImage: '',
+        blogTitle: '',
+        blogSubtitle: '',
+        statsTitle: '',
+        statsSubtitle: '',
+        stats: []
     });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -146,6 +165,27 @@ export default function AdminHomepage() {
                                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">সাবটাইটেল</label>
                                     <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.heroSubtitle} onChange={(e) => setFormData({ ...formData, heroSubtitle: e.target.value })} placeholder="মজবুত, টেকসই ও প্রিমিয়াম..." />
                                 </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">হিরো ব্যাজ (Badge)</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.heroBadge} onChange={(e) => setFormData({ ...formData, heroBadge: e.target.value })} placeholder="বাংলাদেশি পরিবেশ উপযোগী ডিজাইন" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Categories Section Titles */}
+                    <div className="space-y-6 border-b border-slate-100 pb-8">
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <Layout className="text-purple-600" /> ক্যাটাগরি সেকশন
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ক্যাটাগরি টাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.categoriesTitle} onChange={(e) => setFormData({ ...formData, categoriesTitle: e.target.value })} placeholder="আমাদের পণ্যসমূহ" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ক্যাটাগরি সাবটাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.categoriesSubtitle} onChange={(e) => setFormData({ ...formData, categoriesSubtitle: e.target.value })} placeholder="বাড়ি, বারান্দা ও বিল্ডিংয়ের সৌন্দর্য..." />
                             </div>
                         </div>
                     </div>
@@ -167,30 +207,56 @@ export default function AdminHomepage() {
                     </div>
 
                     {/* Featured Product */}
-                    <div className="border-b border-slate-100 pb-8">
+                    <div className="space-y-6 border-b border-slate-100 pb-8">
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <Star className="text-orange-500" /> বিশেষ পণ্য (Featured)
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">সিলেক্ট প্রোডাক্ট</label>
+                                <select
+                                    className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none"
+                                    value={formData.featuredProduct ? (formData.featuredProduct as any).id || formData.featuredProduct : ''}
+                                    onChange={(e) => {
+                                        const selectedId = e.target.value;
+                                        const selectedProduct = products.find(p => p.id.toString() === selectedId);
+                                        setFormData({ ...formData, featuredProduct: selectedProduct });
+                                    }}
+                                >
+                                    <option value="">Select a product...</option>
+                                    {products.map(p => (
+                                        <option key={p.id} value={p.id}>{p.name} ({p.modelNo})</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">সেকশন টাইটেল (Home Display)</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.featuredProductTitle} onChange={(e) => setFormData({ ...formData, featuredProductTitle: e.target.value })} placeholder="জনপ্রিয় পণ্য" />
+                            </div>
+                        </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Featured Product</label>
-                            <select
-                                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none"
-                                value={formData.featuredProduct ? (formData.featuredProduct as any).id || formData.featuredProduct : ''}
-                                onChange={(e) => {
-                                    const selectedId = e.target.value;
-                                    const selectedProduct = products.find(p => p.id.toString() === selectedId);
-                                    setFormData({ ...formData, featuredProduct: selectedProduct });
-                                }}
-                            >
-                                <option value="">Select a product...</option>
-                                {products.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name} ({p.modelNo})</option>
-                                ))}
-                            </select>
+                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">সেকশন ডেসক্রিপশন (Home Display)</label>
+                            <textarea rows={2} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.featuredProductDescription} onChange={(e) => setFormData({ ...formData, featuredProductDescription: e.target.value })} placeholder="ডেকোরেটিভ পোরচ পিলার – Top, Middle ও Bottom..." />
                         </div>
                     </div>
 
                     {/* Why Choose Us */}
                     <div className="space-y-6 border-b border-slate-100 pb-8">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-black uppercase text-slate-900">Why Choose Us</h3>
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <Plus size={14} className="text-blue-600" /> কেন আমাদের বেছে নেবেন?
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">মেইন টাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.featuresTitle} onChange={(e) => setFormData({ ...formData, featuresTitle: e.target.value })} placeholder="কেন Engineers Enterprise বেছে নেবেন?" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">সাবটাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.featuresSubtitle} onChange={(e) => setFormData({ ...formData, featuresSubtitle: e.target.value })} placeholder="আমরা সুন্দর ডিজাইনের পাশাপাশি গুণগত..." />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-4">
+                            <h4 className="text-xs font-black uppercase text-slate-400 tracking-widest">বৈশিষ্ট্যসমূহ (Features List)</h4>
                             <button type="button" onClick={addWhyChooseUs} className="text-[10px] font-black bg-slate-900 text-white px-4 py-2 rounded-xl flex items-center gap-2">
                                 <Plus size={14} /> Add Item
                             </button>
@@ -212,9 +278,26 @@ export default function AdminHomepage() {
                     </div>
 
                     {/* Order Steps */}
-                    <div className="space-y-6 pb-8">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-black uppercase text-slate-900">Order Steps</h3>
+                    <div className="space-y-6 border-b border-slate-100 pb-8">
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <MessageCircle className="text-blue-600" /> অর্ডার করার ধাপসমূহ
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">অর্ডার সেকশন টাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.orderStepsTitle} onChange={(e) => setFormData({ ...formData, orderStepsTitle: e.target.value })} placeholder="কিভাবে অর্ডার করবেন?" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">অর্ডার সেকশন সাবটাইটেল</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.orderStepsSubtitle} onChange={(e) => setFormData({ ...formData, orderStepsSubtitle: e.target.value })} placeholder="সরাসরি আলোচনার মাধ্যমে ঝামেলামুক্ত..." />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">বিঃদ্রঃ নোট (Bottom Note)</label>
+                                <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.orderStepsNote} onChange={(e) => setFormData({ ...formData, orderStepsNote: e.target.value })} placeholder="বিঃদ্রঃ: অনলাইন পেমেন্ট প্রয়োজন নেই..." />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-4">
+                            <h4 className="text-xs font-black uppercase text-slate-400 tracking-widest">অর্ডার ধাপসমূহ (Steps List)</h4>
                             <button type="button" onClick={addOrderStep} className="text-[10px] font-black bg-slate-900 text-white px-4 py-2 rounded-xl flex items-center gap-2">
                                 <Plus size={14} /> Add Step
                             </button>
@@ -235,6 +318,65 @@ export default function AdminHomepage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Emotional Trust Section */}
+                    <div className="space-y-6 border-b border-slate-100 pb-8">
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <Star className="text-blue-500" /> ইমোশনাল ট্রাস্ট সেকশন
+                        </h3>
+                        <div className="flex flex-col md:flex-row gap-8">
+                            <div className="w-full md:w-1/3">
+                                <ImageUploader
+                                    label="Trust Section Image"
+                                    value={formData.emotionalTrustImage}
+                                    onChange={(url) => setFormData({ ...formData, emotionalTrustImage: url })}
+                                />
+                            </div>
+                            <div className="w-full md:w-2/3 space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ট্রাস্ট টাইটেল</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none font-bold" value={formData.emotionalTrustTitle} onChange={(e) => setFormData({ ...formData, emotionalTrustTitle: e.target.value })} placeholder="আপনার বাড়ির সৌন্দর্য, আমাদের দায়িত্ব" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ট্রাস্ট ডেসক্রিপশন</label>
+                                    <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.emotionalTrustDescription} onChange={(e) => setFormData({ ...formData, emotionalTrustDescription: e.target.value })} placeholder="আমরা বিশ্বাস করি একটি সুন্দর বাড়ি..." />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ট্রাস্ট কোট (Quote)</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none italic" value={formData.emotionalTrustQuote} onChange={(e) => setFormData({ ...formData, emotionalTrustQuote: e.target.value })} placeholder="আমরা শুধু ম্যাটেরিয়াল বিক্রি করি না..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Blog & Stats Titles */}
+                    <div className="space-y-6 border-b border-slate-100 pb-8">
+                        <h3 className="text-lg font-black uppercase text-slate-900 flex items-center gap-2">
+                            <Layout className="text-blue-600" /> ব্লগ ও পরিসংখ্যান টাইটেল
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ব্লগ টাইটেল</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.blogTitle} onChange={(e) => setFormData({ ...formData, blogTitle: e.target.value })} placeholder="জানুন ও বুঝে নিন" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">ব্লগ সাবটাইটেল</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.blogSubtitle} onChange={(e) => setFormData({ ...formData, blogSubtitle: e.target.value })} placeholder="পিলার, ফ্যান্সি ব্লক ও কংক্রিট ডিজাইন..." />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">পরিসংখ্যান (Stats) টাইটেল</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.statsTitle} onChange={(e) => setFormData({ ...formData, statsTitle: e.target.value })} placeholder="আমাদের অর্জন" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">পরিসংখ্যান সাবটাইটেল</label>
+                                    <input type="text" className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold outline-none" value={formData.statsSubtitle} onChange={(e) => setFormData({ ...formData, statsSubtitle: e.target.value })} placeholder="দীর্ঘ পথচলায় আমরা আপনাদের পাশে..." />
+                                </div>
+                            </div>
                         </div>
                     </div>
 

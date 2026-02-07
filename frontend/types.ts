@@ -125,10 +125,28 @@ export interface CategoryItem {
 export interface HomepageData {
   heroTitle?: string;
   heroSubtitle?: string;
+  heroBadge?: string;
   heroImage?: string;
   whatsappNumber?: string;
   imoNumber?: string;
   featuredProduct?: Product;
+  featuredProductTitle?: string;
+  featuredProductDescription?: string;
+  categoriesTitle?: string;
+  categoriesSubtitle?: string;
+  featuresTitle?: string;
+  featuresSubtitle?: string;
+  orderStepsTitle?: string;
+  orderStepsSubtitle?: string;
+  orderStepsNote?: string;
+  emotionalTrustTitle?: string;
+  emotionalTrustDescription?: string;
+  emotionalTrustQuote?: string;
+  emotionalTrustImage?: string;
+  blogTitle?: string;
+  blogSubtitle?: string;
+  statsTitle?: string;
+  statsSubtitle?: string;
   features?: {
     title: string;
     description: string;
